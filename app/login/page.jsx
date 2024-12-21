@@ -1,27 +1,54 @@
 'use client';
 import { useState } from "react";
 import Link from "next/link"
+import { useRouter } from "next/navigation";
+
+export var boolean = false;
 
 const login = () => {
 
   const [eye, setEye] = useState("Show");
-    const [type, setType] = useState("Password");
+  const [type, setType] = useState("Password");
+  const router = useRouter();
 
-    const check = (e) => {
-        if (eye === "Show") {
-            setEye("Hide");
-            setType("text");
-        }
-        else{
-            setEye("Show");
-            setType("Password");
-        }
+  const check = (e) => {
+    if (eye === "Show") {
+      setEye("Hide");
+      setType("text");
     }
+    else{
+      setEye("Show");
+      setType("Password");
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const username = e.target[0].value.trim();
+    const password = e.target[1].value.trim();
+
+    try{
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({username, password:password})
+        });
+        const resJson = await response.json();
+        if(resJson.status === 200){
+          localStorage.setItem('loggedIn', true);
+          router.push('/');
+        }
+    }catch(error){
+        console.log(error, 'Failed to register');
+    }
+  }
   
   return (
     <div className='transition-colors bg-orange-300/30 duration-300 hover:bg-orange-400/30 p-5 w-96 rounded-lg backdrop-blur-lg'>
         <h1 className="relo_text text-center pb-2 pt-2">Login</h1>
-        <form className="p-5">
+        <form className="p-5" onSubmit={handleSubmit}>
             <input type="text" placeholder="Username" className="focus:outline-none w-full p-3 text-gray-700 border-b-2 rounded-lg border-gray-300 mb-5" required/>
             <div className="focus:outline flex items-center w-full bg-white text-gray-700 border-b-2 rounded-lg border-gray-300 mb-5">
                 <input type={type} placeholder="Password" className="m-0 pl-2.5 w-64 focus:outline-none" required/>

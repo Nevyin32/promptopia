@@ -1,13 +1,33 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { usePathname } from '@node_modules/next/navigation';
+import { cookies } from '@node_modules/next/headers';
 
 const Nav = () => {
+  const [isUserloggedIn, setIsUserloggedIn] = useState(false);
+  const [toggleDropdown, settoggleDropdown] = useState(false);
+  const pathname = usePathname();
+  
+  useEffect(() => {
+    const token= localStorage.getItem('loggedIn');
+    if(token === 'true')
+      setIsUserloggedIn(true);
+    else{
+      setIsUserloggedIn(false);
+    }
+    return
+  }, [pathname]);
 
-  const isUserloggedIn = false;
-  const [toggleDropdown, settoggleDropdown] = useState(false)
+  const signout = async () => {
+    setIsUserloggedIn(false);
+    localStorage.clear();
+    const response = await fetch('api/signout', {
+      method: 'GET'
+    });
 
+  }
   
   return (
     <nav className='flex-between w-full mb-16 pt-3'>
@@ -23,7 +43,7 @@ const Nav = () => {
             <Link href="/create-prompt" className='black_btn'>
               Create Post
             </Link>
-            <button type='button' className='outline_btn'>
+            <button type='button' onClick={signout} className='outline_btn'>
               Sign Out
             </button>
             <Link href="/profile">
@@ -59,5 +79,4 @@ const Nav = () => {
     </nav>
   )
 }
-
-export default Nav
+export default Nav;

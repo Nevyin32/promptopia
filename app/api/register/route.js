@@ -1,14 +1,13 @@
 import User from '@models/user';
 import { connectToDB } from "@utils/database";
 import { NextResponse } from "next/server";
-// const Bcrypt = require("bcrypt");
+import bcrypt from "bcrypt";
 
 export const POST = async (req, res) => {
     const {username, email, password} = await req.json();
-
+    
     try{
         const res = await connectToDB();
-        console.log(res, " connected to MongoDB");
     }catch(error){
         console.log(error);
     }
@@ -17,20 +16,19 @@ export const POST = async (req, res) => {
     const existingUsername = await User.findOne({username});
 
     if (existingUser){
-        return new NextResponse("Email already exists", {status: 400});
+        return NextResponse.json({error:"Email already in use"}, {status: 400});
     }
-
     if (existingUsername){
-        return new NextResponse("Username already exists", {status: 400});
+        return NextResponse.json({error: "Username already in use"}, {status: 400});
     }
-
-    // const hasedPassword = await Bcrypt.hash(password, 10);
-    const newUser = await User.create({username, email, password});
+    
+    const hasedPassword = await bcrypt.hash(password, 10);
+    const newUser = await User.create({username, email, password: hasedPassword});
 
     try{
         await newUser.save();
-        return new NextResponse("User created successfully", {status: 201});
+        return NextResponse.json({status: 201});
     }catch(error){
-        return new NextResponse(error, {status:500});
+        return NextResponse.json({error:error}, {status:500});
     }
 }
