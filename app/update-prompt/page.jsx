@@ -3,8 +3,9 @@ import {useState, useEffect} from 'react';
 import Form from '@components/Form';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 
-const EditPrompt = () => {
+const Main = () => {
     const router = useRouter();
     const [submitting, setSubmitting] = useState(false);
     const [post, setPost] = useState({
@@ -66,5 +67,12 @@ const EditPrompt = () => {
         />
     )
 }
-
+function EditPrompt() {
+    return (
+      // You could have a loading skeleton as the `fallback` too
+      <Suspense>
+        <Main />
+      </Suspense>
+    )
+  }
 export default EditPrompt

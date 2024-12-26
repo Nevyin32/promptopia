@@ -3,9 +3,10 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Profile from '@components/Profile';
 import { useParams } from 'next/navigation';
+import { Suspense } from 'react';
 
 
-const profile = () => {
+const Main = () => {
   const params = useParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -41,5 +42,13 @@ const profile = () => {
     </>
   )
 }
+function profile() {
+    return (
+      // You could have a loading skeleton as the `fallback` too
+      <Suspense>
+        <Main />
+      </Suspense>
+    )
+  }
 
 export default profile
