@@ -3,12 +3,11 @@ import { useState } from "react";
 import Link from "next/link"
 import { useRouter } from "next/navigation";
 
-export var boolean = false;
-
 const login = () => {
 
   const [eye, setEye] = useState("Show");
   const [type, setType] = useState("Password");
+  const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
 
   const check = (e) => {
@@ -24,6 +23,7 @@ const login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     const username = e.target[0].value.trim();
     const password = e.target[1].value.trim();
 
@@ -35,13 +35,17 @@ const login = () => {
             },
             body: JSON.stringify({username, password:password})
         });
-        const resJson = await response.json();
-        if(resJson.status === 200){
+        const resJson = await response?.json();
+        if(resJson?.status === 200){
           localStorage.setItem('loggedIn', true);
+          localStorage.setItem('img', resJson.img)
+          localStorage.setItem('userId', resJson.userId)
           router.push('/');
         }
     }catch(error){
         console.log(error, 'Failed to register');
+    }finally{
+      setSubmitting(false);
     }
   }
   
@@ -54,7 +58,7 @@ const login = () => {
                 <input type={type} placeholder="Password" className="m-0 pl-2.5 w-64 focus:outline-none" required/>
                 <button type="button" className="h-12" onClick={check}>{eye}</button>
             </div>
-            <button type="submit" className="font-medium transition-colors bg-primary-orange/80 duration-200 hover:bg-primary-orange p-2 rounded-lg w-full text">Submit</button>
+            <button type="submit" className="font-medium transition-colors bg-primary-orange/80 duration-200 hover:bg-primary-orange p-2 rounded-lg w-full text">Submit{submitting ? `...` : ``}</button>
         </form>
         <Link className="flex justify-center w-full px-full font-medium" href="/register">Register</Link>
     </div>

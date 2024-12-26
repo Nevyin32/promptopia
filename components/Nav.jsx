@@ -3,17 +3,25 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { usePathname } from '@node_modules/next/navigation';
-import { cookies } from '@node_modules/next/headers';
+import Cookies from 'js-cookie';
 
 const Nav = () => {
-  const [isUserloggedIn, setIsUserloggedIn] = useState(false);
+  const [isUserloggedIn, setIsUserloggedIn] = useState();
+  const [profileImg, setProfileImg] = useState('/assets/images/logo.svg');
   const [toggleDropdown, settoggleDropdown] = useState(false);
   const pathname = usePathname();
   
+  const getImg = () => {
+    const cookies = localStorage.getItem('img');
+    setProfileImg(cookies);
+  }
+  
   useEffect(() => {
     const token= localStorage.getItem('loggedIn');
-    if(token === 'true')
+    if(token === 'true'){
+      getImg();
       setIsUserloggedIn(true);
+    }
     else{
       setIsUserloggedIn(false);
     }
@@ -38,7 +46,7 @@ const Nav = () => {
 
       {/* Desktop Navigation */}
       <div className='sm:flex hidden'>
-        {isUserloggedIn ? (
+        {isUserloggedIn ?(
           <div className='flex gap-3 md:gap-5'>
             <Link href="/create-prompt" className='black_btn'>
               Create Post
@@ -47,33 +55,37 @@ const Nav = () => {
               Sign Out
             </button>
             <Link href="/profile">
-              <Image src='/assets/images/logo.svg' alt="User profile" width={37} height={37} className='rounded-full'/>
+              <div className='overflow-hidden'>
+                <Image src={profileImg} alt="User profile" width={37} height={37} className='custom-position'/>
+              </div>
             </Link>
           </div>
-        ): (
-            <Link href="/login" className='black_btn'>
-              Sign In
-            </Link>
-        )}
+        ):  (
+          <Link href="/login" className='black_btn'>
+            Sign In
+          </Link>
+      )}
       </div>
 
       {/* Mobile Navigation */}
       <div className='sm:hidden flex relative'>
         {isUserloggedIn? (
           <div className='flex'>
-            <Image src='/assets/images/logo.svg' alt="User profile" width={37} height={37} className='rounded-full' onClick={() => {settoggleDropdown((prev) => !prev)}}/>
+            <div className='overflow-hidden'>
+                <Image src={profileImg} alt="User profile" width={37} height={37} className='custom-position' onClick={() => {settoggleDropdown((prev) => !prev)}}/>
+            </div>
             {toggleDropdown && (
               <div className='dropdown'>
                 <Link href='/profile' className='dropdown_link' onClick={() => settoggleDropdown(false)}>My Profile</Link>
                 <Link href='/create-prompt' className='dropdown_link' onClick={() => settoggleDropdown(false)}>Create Prompt</Link>
-                <button type='button' onClick={() => {settoggleDropdown(false); signOut()}} className='mt-5 w-full black_btn'>Sign Out</button>
+                <button type='button' onClick={signout} className='mt-5 w-full black_btn'>Sign Out</button>
               </div>
             )}
           </div>
         ):(
-          <button type='button' className='black_btn'>
+          <Link href='/login' className='black_btn'>
             Sign In
-          </button>
+          </Link>
         )}
       </div>
     </nav>

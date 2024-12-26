@@ -171,3 +171,11 @@
 .flex-between {
   @apply flex justify-between items-center;
 }
+
+.custom-position {
+  transform: scale(5000px);
+  height: 37px;
+  width: 37px;
+  border-radius: 100%;
+  object-position: center center;
+}

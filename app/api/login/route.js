@@ -19,9 +19,10 @@ export const POST = async (req, res) => {
     if (existingUser) {
         const isMatch = await bcrypt.compare(password, existingUser?.password);
         if(isMatch) {
-            const token = sign({ userId: existingUser._id }, process.env.JWT_SECRET, { expiresIn: '1s' });
-            cookiesSet.set('token', token, {secure: true, httpOnly: true});
-            return NextResponse.json({status: 200, message: "Login successful"});
+            const token = sign({ userId: existingUser._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+            const Image = existingUser.image;
+            cookiesSet.set('token', token, {secure: true, httpOnly: true, path:'/', maxAge: 60*60*24});
+            return NextResponse.json({status: 200, message: "Login successful", img:Image, userId: existingUser._id});
         }
         else{
             return NextResponse.json({status: 400, message: "Password is wrong!"});

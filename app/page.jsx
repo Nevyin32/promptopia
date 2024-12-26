@@ -1,6 +1,24 @@
+'use client'
 import Feed from '@components/Feed';
+import { useEffect } from 'react';
+import Cookies from 'js-cookie';
+import { usePathname } from '@node_modules/next/navigation';
+
+function getCookie(){
+  const cookies = Cookies.get('clear-localStorage');
+  if(cookies === 'true'){
+    localStorage.clear();
+    return;
+  }
+}
 
 const Home = () => {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    getCookie();
+  }, [pathname]);
+  
   return (
      <section className="w-full flex-center flex-col">
       <h1 className="head_text text-center">
